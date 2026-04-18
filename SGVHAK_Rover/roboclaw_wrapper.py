@@ -21,9 +21,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
-import configuration
-from roboclaw import Roboclaw
-from roboclaw_stub import Roboclaw_stub
+from . import configuration
+from .roboclaw import Roboclaw
+from .roboclaw_stub import Roboclaw_stub
 
 # For the 'buffered' parameter into RoboClaw API.
 immediate_execution = 1

@@ -24,7 +24,7 @@ SOFTWARE.
 import serial
 from struct import *
 
-import configuration
+from . import configuration
 
 def bytetohex(bytearray):
   """

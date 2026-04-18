@@ -24,7 +24,7 @@ SOFTWARE.
 {% extends "layout.html" %}
 {% block body %}
 <div class="container">
-{% for name,voltage in voltages.iteritems() %}
+{% for name, voltage in voltages.items() %}
 <div class="row">
   {{name}} /
   Roll {{ voltage['Rolling'] }} /

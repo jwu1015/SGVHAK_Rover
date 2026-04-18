@@ -1,7 +1,21 @@
 {
+  "_sawppy_id_map": "LX-16A IDs expected by config_roverchassis.json.sawppy (rename one servo on the bus at a time from factory ID 1)",
+  "sawppy_ids": {
+    "rear_left_rolling": 20,
+    "mid_left_rolling": 21,
+    "mid_right_rolling": 22,
+    "front_left_steering": 23,
+    "rear_left_steering": 24,
+    "front_left_rolling": 25,
+    "rear_right_steering": 26,
+    "front_right_rolling": 27,
+    "rear_right_rolling": 28,
+    "front_right_steering": 29
+  },
+  "_port_discovery": "Linux/Pi: plug USB bus adapter, then run: dmesg | tail -30 (or ls -l /dev/serial/by-id/). Common devices: /dev/ttyUSB0 (CH340), /dev/ttyACM0 (CDC ACM). macOS: ls /dev/tty.* for usbserial / wchusbserial / usbmodem. Edit connect.port below to match.",
   "connect": {
     "baudrate": 115200,
-    "port": "Replace with path to serial interface device. On Linux it might be /dev/ttyUSB0",
+    "port": "/dev/ttyUSB0",
     "timeout": 0.5
   }
 }

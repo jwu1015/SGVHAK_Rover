@@ -1,0 +1,204 @@
+================================================================================
+  SGVHAK ROVER SOFTWARE — SIMPLE GUIDE FOR NEW PEOPLE
+================================================================================
+
+WHAT IS THIS PROJECT?
+---------------------
+  This program runs on a small computer (often a Raspberry Pi) on the rover.
+  It shows a web page in your browser so you can drive the robot like a remote
+  control car.  It also does the math so six wheels and steering work together.
+
+  There is NO self-driving or AI.  It only moves when a human sends commands.
+
+
+THE BIG PICTURE (3 STEPS)
+-------------------------
+  1) You use a web page in the browser (or someday a real gamepad script).
+
+  2) The web page sends numbers to the Python program (Flask) on the rover.
+
+  3) The Python program figures out what each wheel should do and talks to
+     the motor hardware (or a "fake" motor for practice on a laptop).
+
+
+IMPORTANT: THE "JOYSTICK" ON THE WEB PAGE IS NOT A REAL JOYSTICK
+----------------------------------------------------------------
+  The round or square touch pad is a picture on the screen.  You drag the
+  knob with the mouse or your finger.
+
+  It is NOT reading a USB gamepad.  A real joystick would be a separate small
+  program (not finished in this repo yet).  See: workshops/joystick-interface-workshop.md
+
+
+HOW TO RUN THE APP ON YOUR COMPUTER (PRACTICE MODE)
+---------------------------------------------------
+  Do this from the folder that contains THIS file (the project root).
+
+  A) One-time setup:
+        ./scripts/bootstrap_dev.sh
+
+  B) Every time you want to run the web app:
+        source venv/bin/activate
+        export FLASK_APP=SGVHAK_Rover
+        flask run
+
+  C) Open your web browser to:
+        http://127.0.0.1:5000/
+
+  On a laptop without robot hardware, the motors are "fake" (TEST mode) so
+  nothing moves, but you can still click through the pages and learn the UI.
+
+
+WHERE ARE THE SETTINGS FILES?
+-----------------------------
+  All in the SAME folder as this file (project root).  Names start with config_
+
+  Examples:
+    config_roverchassis.json  —  Where each wheel sits on the robot and which
+                                 motor controller drives it.
+    config_roboclaw.json      —  Serial port and tuning for RoboClaw controllers.
+                                 "port": "TEST" means fake hardware (safe on PC).
+    config_lewansoul.json     —  Serial port for LewanSoul servos (Sawppy style).
+
+  If Flask says it cannot find a config file, you probably started flask from
+  the wrong folder.  Always start from the project root.
+
+
+WHERE CAN I SEE THE DRIVE COMMANDS?
+-----------------------------------
+  A) WHAT THE BROWSER SENDS (the raw numbers from the on-screen pad)
+     — Open the browser Developer Tools → Network tab.
+     — Move the on-screen knob.
+     — Click the request named "drive_command" (POST).
+     — Look at Form Data: "pct_angle" and "magnitude".
+
+  B) WHAT THE SOFTWARE DECIDED FOR EACH WHEEL (easier to understand)
+     — In the rover web menu, open "Chassis configuration".
+     — It updates while you drive.  You see each wheel's velocity and angle.
+
+  C) WHERE THAT LOGIC LIVES IN CODE
+     — SGVHAK_Rover/menu.py  →  search for "drive_command"
+     — SGVHAK_Rover/roverchassis.py  →  search for "move_velocity_radius"
+
+
+MAIN MENU ITEMS (WHAT THEY ARE FOR)
+-----------------------------------
+  Drive via Polar (Round) Pad     —  Drag knob on a circle; good on phones.
+  Drive via Cartesian Pad         —  Drag knob in a box; forward/back and left/right.
+  Drive by Angle/Velocity         —  Sliders instead of a pad.
+  Chassis configuration         —  See wheel math / status (good for debugging).
+  Steering trim                   —  Fix steering center on real hardware.
+  Motor Input Voltages            —  Battery-ish readings from controllers.
+  Shutdown/Reboot                 —  For the Pi only; uses Linux systemctl.
+
+
+FILES YOU MIGHT HEAR PEOPLE MENTION
+------------------------------------
+  SGVHAK_Rover/menu.py           —  Web pages and URLs (routes).
+  SGVHAK_Rover/roverchassis.py   —  Wheel math and "move_velocity_radius".
+  SGVHAK_Rover/templates/*.html  —  HTML layout for each page.
+  SGVHAK_Rover/static/*.js       —  Browser JavaScript (pads, sliders, polling).
+
+  workshops/joystick-interface-workshop.md
+                                 —  Step-by-step plan to add a REAL gamepad later.
+
+
+WHEN YOU GET A RASPBERRY PI / REAL HARDWARE
+---------------------------------------------
+  1) Copy this project to the Pi.
+  2) Use real motor settings in the config_*.json files (not TEST for RoboClaw
+     if you use real RoboClaws).
+  3) Run "flask run --host=0.0.0.0" so other devices on Wi-Fi can open the page.
+  The README.md in this project has more Pi deployment notes.
+
+
+IF SOMETHING BREAKS
+-------------------
+  — Read the error in the terminal where "flask run" is running.
+  — Check you are in the project root and venv is activated.
+  — Check config file paths (serial ports) match your machine (Mac vs Linux).
+
+
+QUESTIONS TO ASK A MENTOR (GOOD STARTERS)
+-----------------------------------------
+  — Which motor hardware is on OUR rover (RoboClaw? LewanSoul? both?)?
+  — Which config_roverchassis.json copy is the one we actually use?
+  — Is it OK to drive while someone else is testing serial tools? (Usually: no;
+     only one program should command motors at a time.)
+
+
+================================================================================
+  YOU KNOW NOTHING YET — HERE IS STILL USEFUL WORK (IN ORDER)
+================================================================================
+
+  You do NOT need robotics experience for the items below.  Pick from the top;
+  each line is a small win.  Ask a mentor when a step says "show someone."
+
+  WEEK 0 — Get oriented (no code changes)
+  --------------------------------------
+  [ ] Read this whole file once.  Underline words you do not know; look them up
+      or ask.
+
+  [ ] Get the web app running on your laptop (see "HOW TO RUN" above).  If it
+      fails, copy the FULL error text into a note and ask for help.
+
+  [ ] Click every button on the main menu.  For each one, write one sentence:
+      "This page lets you ___."
+
+  [ ] Open the Polar drive pad.  Open Developer Tools → Network.  Drag the
+      knob.  Find the "drive_command" POST and write down what "pct_angle" and
+      "magnitude" are when you push straight forward vs when you turn.
+
+  [ ] Open "Chassis configuration" in a second tab.  While you move the pad,
+      watch the numbers change.  Take 3 screenshots for the team wiki (optional
+      but very helpful for the next beginner).
+
+  WEEK 1 — Learn the files (still safe)
+  -------------------------------------
+  [ ] In the project, open SGVHAK_Rover/menu.py and use search (Ctrl+F) for
+      "drive_command".  Read from the @app.route line down to
+      move_velocity_radius.  You do not need to understand every line; goal is
+      to see that browser numbers become one Python call.
+
+  [ ] Open config_roverchassis.json.  List the wheel NAMES you see.  For ONE
+      wheel, copy its "x" and "y" numbers onto paper.  (Those are positions on
+      the robot drawing — exact math comes later.)
+
+  [ ] Compare two example configs side by side (just reading):
+          config_roverchassis.json          (example in repo)
+          config_roverchassis.json.sawppy   (Sawppy-style example)
+      Write 3 bullet points: "These files differ because ___."
+
+  WEEK 2 — Small improvements (good first edits; use git branch; ask for review)
+  -------------------------------------------------------------------------------
+  [ ] Fix obvious typos in user-visible text.  Search SGVHAK_Rover/templates and
+      menu.py for words users see (titles, buttons).  Use the browser to click
+      through every page while you look for mistakes.
+
+  [ ] Add 2–3 sentences to the TOP of NEW_HELPERS_READ_THIS.txt with YOUR team's
+      Wi-Fi name / who to ping on Slack / meeting time — whatever a new person
+      needs that this generic file does not say.
+
+  [ ] Run through workshops/joystick-interface-workshop.md Phase 1 checkboxes
+      and mark what you finished in your own notes (or a team checklist).
+
+  LATER — Only with a mentor (touches real robot or harder code)
+  --------------------------------------------------------------
+  [ ] Workshop Phase 3–4: understand move_velocity_radius; help extract mapping
+      into control_mapping.py (Python).
+
+  [ ] Workshop Phase 5: pygame + scripts/joystick_drive.py (needs gamepad + Pi
+      or agreed test setup).
+
+  [ ] On the Pi: real config files, real driving — always supervised.
+
+  WHAT NOT TO DO ALONE (FIRST MONTH)
+  ----------------------------------
+  — Do not change motor serial ports or wheel IDs on hardware without a mentor.
+  — Do not merge code you have not run locally (flask run + click test).
+  — Do not run two programs that both drive motors at the same time.
+
+================================================================================
+  End of guide.  When in doubt, run the web app with TEST hardware and explore
+  the Chassis configuration page while moving the on-screen pad.
+================================================================================

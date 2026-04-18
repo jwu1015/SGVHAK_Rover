@@ -25,7 +25,7 @@ from subprocess import call
 import socket
 from SGVHAK_Rover import app
 from flask import flash, json, redirect, render_template, request, url_for
-import roverchassis
+from . import roverchassis
 
 # Rover chassis geometry, including methods to calculate wheel angle and
 # velocity based on chassis geometry.
@@ -175,7 +175,7 @@ class main_menu:
       wheelTable = wheelTable,
       wheelOffset = wheelOffset,
       local_ip = IP,
-      page_title = 'Chassis Configuraton')
+      page_title = 'Chassis Configuration')
 
   @app.route('/request_wheel_status', methods=['POST'])
   def request_wheel_status():
@@ -187,7 +187,7 @@ class main_menu:
     """
     chassis.ensureready()
     wheelInfo = dict()
-    for name, wheel in chassis.wheels.iteritems():
+    for name, wheel in chassis.wheels.items():
       wheelInfo[name] = dict()
       wheelInfo[name]['velocity'] = wheel.velocity
       wheelInfo[name]['angle'] = wheel.angle
@@ -204,7 +204,7 @@ class main_menu:
     if request.method == 'GET':
       # Find all the wheels that we can steer
       steered_wheels = list()
-      for name, wheel in chassis.wheels.iteritems():
+      for name, wheel in chassis.wheels.items():
         if wheel.steeringcontrol:
           steered_wheels.append(name)
       steered_wheels.sort()
@@ -268,7 +268,7 @@ class main_menu:
     chassis.ensureready()
     voltages = dict()
 
-    for name,wheel in chassis.wheels.iteritems():
+    for name, wheel in chassis.wheels.items():
       voltages[name] = wheel.motor_voltage()
 
     return render_template("input_voltage.html",

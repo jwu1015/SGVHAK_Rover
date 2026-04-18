@@ -24,7 +24,7 @@ SOFTWARE.
 import serial
 import struct
 
-import configuration
+from . import configuration
 
 maxangle = 45 # TODO: make this generally configurable
 

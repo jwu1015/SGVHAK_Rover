@@ -23,12 +23,12 @@ SOFTWARE.
 """
 import math
 import logging
-import configuration
-import roboclaw_wrapper
-import adafruit_servo_wrapper
-import lewansoul_wrapper
-import dynamixel_wrapper
-import dmfe_wrapper
+from . import configuration
+from . import roboclaw_wrapper
+from . import adafruit_servo_wrapper
+from . import lewansoul_wrapper
+from . import dynamixel_wrapper
+from . import dmfe_wrapper
 
 # Python 2 does not have a constant for infinity. (Python 3 added math.inf.)
 infinity = float("inf")
@@ -189,28 +189,28 @@ class chassis:
       asw = adafruit_servo_wrapper.adafruit_servo_wrapper()
       asw.connect()
       self.motorcontrollers['adafruit_servo'] = asw
-    except StandardError as se:
+    except Exception as se:
       logging.getLogger(__name__).error("Unable to initialize Adafruit Servo HAT library: %s",str(se))
 
     try:
       lws = lewansoul_wrapper.lewansoul_wrapper()
       lws.connect()
       self.motorcontrollers['lewansoul'] = lws
-    except StandardError as se:
+    except Exception as se:
       logging.getLogger(__name__).error("Unable to initialize LewanSoul Servo Library: %s",str(se))
 
     try:
       dms = dynamixel_wrapper.dynamixel_wrapper()
       dms.connect()
       self.motorcontrollers['dynamixel'] = dms
-    except StandardError as se:
+    except Exception as se:
       logging.getLogger(__name__).error("Unable to initialize Dynamixel Servo Library: %s",str(se))
 
     try:
       dmfe = dmfe_wrapper.dmfe_wrapper()
       dmfe.connect()
       self.motorcontrollers['dmfe'] = dmfe
-    except StandardError as se:
+    except Exception as se:
       logging.getLogger(__name__).error("Unable to initialize DMFE serial bus device library: %s",str(se))
 
   def ensureready(self):
