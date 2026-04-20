@@ -7,7 +7,8 @@ Software path through **shared mapping** and **USB gamepad** is implemented:
 - `SGVHAK_Rover/control_mapping.py` — `polar_to_motion(chassis, pct_angle, magnitude)`
 - `menu.py` — `drive_command` calls that helper (same math as browser pads)
 - `scripts/joystick_drive.py` — pygame loop, deadband, deadman, E-stop, rate limit
-- `SGVHAK_Rover/desktop_app.py` — Tkinter window: sliders + optional gamepad (no Flask / no browser)
+- `SGVHAK_Rover/desktop_app.py` — Tkinter window: polar pad + sliders + optional gamepad (no Flask / no browser)
+- `SGVHAK_Rover/polar_pad_math.py` — same polar math as `static/drive.js` Knob
 - `scripts/rover_desktop.sh` — launcher for the desktop app
 - `scripts/verify_control_mapping.py` — quick math sanity check (no hardware)
 - `setup.py` — optional extra: `pip install -e ".[joystick]"` (pulls in pygame)

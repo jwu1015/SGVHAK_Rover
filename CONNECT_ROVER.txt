@@ -89,8 +89,8 @@ or the same steps from NEW_HELPERS_READ_THIS.txt
 
       Or:  ./scripts/rover_desktop.sh
 
-      Use the sliders and/or tick “Use USB gamepad”. Same motor rules: do not
-      run this at the same time as A or B.
+      Use the on-screen polar pad, sliders, or USB gamepad (radio buttons).
+      Same motor rules: do not run this at the same time as A or B.
 
 --------------------------------------------------------------------------------
 6) SMOKE TEST BEFORE FULL SPEED
