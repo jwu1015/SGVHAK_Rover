@@ -18,7 +18,8 @@ THE BIG PICTURE (3 STEPS)
 -------------------------
   1) You use a web page in the browser, OR a USB gamepad via scripts/joystick_drive.py.
 
-  2) The web page sends numbers to the Python program (Flask) on the rover.
+  2) The web page sends numbers to the Python program (Flask) on the rover,
+     OR you use the native desktop window (no Flask) — see below.
 
   3) The Python program figures out what each wheel should do and talks to
      the motor hardware (or a "fake" motor for practice on a laptop).
@@ -28,8 +29,10 @@ IMPORTANT: SCREEN PAD VS REAL GAMEPAD
 --------------------------------------
   The round or square touch pad is ONLY in the web browser (mouse or finger).
 
-  A physical USB gamepad is a SEPARATE program:  scripts/joystick_drive.py
-  (run on the Pi, with Flask stopped).  Install extras:  pip install -e ".[joystick]"
+  A physical USB gamepad can be used in two ways:
+     — Terminal:  scripts/joystick_drive.py  (Flask stopped)
+     — Native window:  python -m SGVHAK_Rover.desktop_app  (sliders + optional gamepad; no browser)
+  Install gamepad support:  pip install -e ".[joystick]"
 
   Full step list for hardware: CONNECT_ROVER.txt
   Longer learning path: workshops/joystick-interface-workshop.md
@@ -51,7 +54,11 @@ HOW TO RUN THE APP ON YOUR COMPUTER (PRACTICE MODE)
         export FLASK_APP=SGVHAK_Rover
         flask run
 
-  C) Open your web browser to:
+  C) Or run the desktop app (no browser; needs a windowing desktop on the Pi):
+        ./scripts/rover_desktop.sh
+        (On Pi once: sudo apt install python3-tk)
+
+  D) Open your web browser to (only if you chose B):
         http://127.0.0.1:5000/
 
   On a laptop without robot hardware, the motors are "fake" (TEST mode) so
@@ -107,6 +114,7 @@ FILES YOU MIGHT HEAR PEOPLE MENTION
   SGVHAK_Rover/roverchassis.py   —  Wheel math and "move_velocity_radius".
   SGVHAK_Rover/templates/*.html  —  HTML layout for each page.
   SGVHAK_Rover/static/*.js       —  Browser JavaScript (pads, sliders, polling).
+  SGVHAK_Rover/desktop_app.py    —  Native desktop window (no browser).
 
   workshops/joystick-interface-workshop.md
                                  —  Full workshop (mapping + joystick are implemented).

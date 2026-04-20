@@ -7,6 +7,8 @@ Software path through **shared mapping** and **USB gamepad** is implemented:
 - `SGVHAK_Rover/control_mapping.py` — `polar_to_motion(chassis, pct_angle, magnitude)`
 - `menu.py` — `drive_command` calls that helper (same math as browser pads)
 - `scripts/joystick_drive.py` — pygame loop, deadband, deadman, E-stop, rate limit
+- `SGVHAK_Rover/desktop_app.py` — Tkinter window: sliders + optional gamepad (no Flask / no browser)
+- `scripts/rover_desktop.sh` — launcher for the desktop app
 - `scripts/verify_control_mapping.py` — quick math sanity check (no hardware)
 - `setup.py` — optional extra: `pip install -e ".[joystick]"` (pulls in pygame)
 - `CONNECT_ROVER.txt` — what to do when you plug in the real rover
@@ -153,7 +155,9 @@ Software path through **shared mapping** and **USB gamepad** is implemented:
 | `SGVHAK_Rover/roverchassis.py` | `move_velocity_radius`, geometry |
 | `SGVHAK_Rover/menu.py` | HTTP routes; `drive_command` uses `control_mapping` |
 | `SGVHAK_Rover/control_mapping.py` | Shared stick/slider → `(velocity, radius)` |
-| `scripts/joystick_drive.py` | pygame gamepad loop |
+| `scripts/joystick_drive.py` | pygame gamepad loop (terminal) |
+| `SGVHAK_Rover/desktop_app.py` | Tk desktop UI + optional gamepad |
+| `scripts/rover_desktop.sh` | Launch desktop app from repo root |
 | `CONNECT_ROVER.txt` | Hardware hookup checklist |
 | `scripts/pi_install_rover.sh` | Pi/Linux venv + `pip install -e ".[joystick]"` |
 | `scripts/activate_sawppy_config.sh` | Copy Sawppy `config_roverchassis.json` |

@@ -63,7 +63,7 @@ or the same steps from NEW_HELPERS_READ_THIS.txt
 
       On the phone/laptop browser open:  http://<PI_IP_ADDRESS>:5000
 
-  B) USB GAMEPAD (script on the Pi; plug controller into the Pi)
+  B) USB GAMEPAD — terminal only (no window; Pi with controller plugged in)
 
       source venv/bin/activate
       python scripts/joystick_drive.py --list          # see controller index/name
@@ -78,12 +78,26 @@ or the same steps from NEW_HELPERS_READ_THIS.txt
 
       python scripts/joystick_drive.py --help
 
+  C) DESKTOP APP — native window (sliders + optional gamepad; no browser, no Flask)
+
+      Raspberry Pi with monitor (or your laptop), from project root:
+
+      sudo apt install python3-tk     # Pi / Debian only, once, if Tk is missing
+      source venv/bin/activate
+      pip install -e ".[joystick]"    # if you want USB gamepad in the app
+      python -m SGVHAK_Rover.desktop_app
+
+      Or:  ./scripts/rover_desktop.sh
+
+      Use the sliders and/or tick “Use USB gamepad”. Same motor rules: do not
+      run this at the same time as A or B.
+
 --------------------------------------------------------------------------------
 6) SMOKE TEST BEFORE FULL SPEED
 --------------------------------------------------------------------------------
   [ ] Chassis configuration page: numbers move when you nudge controls.
   [ ] Wheels twitch in the correct direction at low stick deflection.
-  [ ] E-stop (gamepad B, or red “Stop Motors” in web) kills motion immediately.
+  [ ] E-stop (gamepad B, or red “Stop Motors” in web, or “Stop motors” in desktop app) kills motion immediately.
 
 --------------------------------------------------------------------------------
 7) IF NOTHING MOVES
@@ -91,6 +105,6 @@ or the same steps from NEW_HELPERS_READ_THIS.txt
   — journal / terminal: any Python traceback?
   — Wrong serial port string in config_lewansoul.json?
   — Wrong config_roverchassis.json for your actual servo IDs?
-  — Two programs both trying to drive (Flask + joystick at same time)?
+  — Two programs both trying to drive (Flask + joystick script + desktop app — only one)?
 
 ================================================================================
