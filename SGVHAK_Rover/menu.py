@@ -25,6 +25,7 @@ from subprocess import call
 import socket
 from SGVHAK_Rover import app
 from flask import flash, json, redirect, render_template, request, url_for
+from . import control_mapping
 from . import roverchassis
 
 # Rover chassis geometry, including methods to calculate wheel angle and
@@ -90,15 +91,8 @@ class main_menu:
       # EXCEPTION: If a stop command arrives, stop immediately.
       pct_angle = float(request.form['pct_angle'])
       magnitude = float(request.form['magnitude'])
-
-      if pct_angle == 0:
-        radius = float("inf")
-      elif pct_angle>0:
-        radius = chassis.minRadius + (chassis.maxRadius-chassis.minRadius) * (100-pct_angle)/100.0
-      else:
-        radius = -chassis.minRadius - (chassis.maxRadius-chassis.minRadius) * (100+pct_angle)/100.0
-
-      chassis.move_velocity_radius(magnitude, radius)
+      velocity, radius = control_mapping.polar_to_motion(chassis, pct_angle, magnitude)
+      chassis.move_velocity_radius(velocity, radius)
 
       return json.jsonify({'Success':1})
 

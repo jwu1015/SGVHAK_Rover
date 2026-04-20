@@ -1,0 +1,96 @@
+================================================================================
+  CONNECT THE REAL ROVER — CHECKLIST (after software is already on the Pi)
+================================================================================
+
+You already have: this repo cloned, venv created, and either
+  bash scripts/pi_install_rover.sh
+or the same steps from NEW_HELPERS_READ_THIS.txt
+
+--------------------------------------------------------------------------------
+1) PHYSICAL WIRING
+--------------------------------------------------------------------------------
+  [ ] Main battery to motor power (per your hardware guide — do not skip fuses).
+  [ ] LewanSoul serial bus adapter plugged into the Pi (USB).
+  [ ] Servo data bus + ground (and logic power if separate) correct for LX-16A.
+  [ ] All ten servo IDs already set to 20–29 to match config (see config_lewansoul.json).
+
+--------------------------------------------------------------------------------
+2) WHICH CHASSIS FILE IS ACTIVE?
+--------------------------------------------------------------------------------
+  Sawppy with LewanSoul wheels (typical for this fork’s docs):
+
+      bash scripts/activate_sawppy_config.sh
+
+  That copies config_roverchassis.json.sawppy → config_roverchassis.json
+
+  If you use a different mechanical layout, keep your own config_roverchassis.json
+  and skip this script.
+
+--------------------------------------------------------------------------------
+3) SERIAL PORT FOR LEWANSOUL
+--------------------------------------------------------------------------------
+  Edit:  config_lewansoul.json
+
+  Set "connect"."port" to the device that appears when the USB adapter is plugged in.
+  On Raspberry Pi OS, common values:
+
+      /dev/ttyUSB0
+      /dev/ttyACM0
+
+  To list candidates:
+
+      ls -l /dev/serial/by-id/
+      dmesg | tail -40
+
+  Save the file.
+
+--------------------------------------------------------------------------------
+4) INSTALL (if not done yet)
+--------------------------------------------------------------------------------
+  From the project root (folder that contains CONNECT_ROVER.txt):
+
+      bash scripts/pi_install_rover.sh
+
+--------------------------------------------------------------------------------
+5) DRIVE — PICK ONE (never two at once)
+--------------------------------------------------------------------------------
+
+  A) WEB BROWSER (phone / laptop on same Wi‑Fi as Pi)
+
+      source venv/bin/activate
+      export FLASK_APP=SGVHAK_Rover
+      flask run --host=0.0.0.0
+
+      On the phone/laptop browser open:  http://<PI_IP_ADDRESS>:5000
+
+  B) USB GAMEPAD (script on the Pi; plug controller into the Pi)
+
+      source venv/bin/activate
+      python scripts/joystick_drive.py --list          # see controller index/name
+      python scripts/joystick_drive.py                # default: hold LB (button 4)
+
+      Headless Pi (no monitor) and pygame complains about video:
+      export SDL_VIDEODRIVER=dummy
+
+      Hold the deadman while moving sticks. Button 1 (B) = cut motor power.
+
+      If your pad uses different buttons:
+
+      python scripts/joystick_drive.py --help
+
+--------------------------------------------------------------------------------
+6) SMOKE TEST BEFORE FULL SPEED
+--------------------------------------------------------------------------------
+  [ ] Chassis configuration page: numbers move when you nudge controls.
+  [ ] Wheels twitch in the correct direction at low stick deflection.
+  [ ] E-stop (gamepad B, or red “Stop Motors” in web) kills motion immediately.
+
+--------------------------------------------------------------------------------
+7) IF NOTHING MOVES
+--------------------------------------------------------------------------------
+  — journal / terminal: any Python traceback?
+  — Wrong serial port string in config_lewansoul.json?
+  — Wrong config_roverchassis.json for your actual servo IDs?
+  — Two programs both trying to drive (Flask + joystick at same time)?
+
+================================================================================

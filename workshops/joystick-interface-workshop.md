@@ -1,5 +1,20 @@
 # Workshop: Joystick → Rover (SGVHAK_Rover)
 
+## Status on this branch
+
+Software path through **shared mapping** and **USB gamepad** is implemented:
+
+- `SGVHAK_Rover/control_mapping.py` — `polar_to_motion(chassis, pct_angle, magnitude)`
+- `menu.py` — `drive_command` calls that helper (same math as browser pads)
+- `scripts/joystick_drive.py` — pygame loop, deadband, deadman, E-stop, rate limit
+- `scripts/verify_control_mapping.py` — quick math sanity check (no hardware)
+- `setup.py` — optional extra: `pip install -e ".[joystick]"` (pulls in pygame)
+- `CONNECT_ROVER.txt` — what to do when you plug in the real rover
+
+**Next real step:** follow `CONNECT_ROVER.txt` (wiring, serial port, Sawppy config, drive).
+
+---
+
 ## The easy explanation
 
 **What the rover software does**
@@ -12,10 +27,10 @@
 - The browser sends “knob” or slider values to Flask (`menu.py`).
 - Flask converts those numbers into **velocity** + **turn radius**, then calls **`move_velocity_radius`**.
 
-**What a joystick would do**
+**What the USB gamepad script does**
 
-- Same end point: read a gamepad, turn stick position into **velocity** + **radius**, call **`move_velocity_radius`**.
-- There is **no** joystick code in the repo today; you add a small program (or a background thread) that does that.
+- Same end point as the browser: read sticks, convert to **velocity** + **radius**, call **`move_velocity_radius`** via `control_mapping.polar_to_motion`.
+- Implemented as **`scripts/joystick_drive.py`** (run on the Pi; stop Flask first if you use the web UI instead).
 
 **What runs where**
 
@@ -47,7 +62,8 @@
 - [ ] **Run server:** `source venv/bin/activate`, `export FLASK_APP=SGVHAK_Rover`, **`flask run`** from the **repo root** (so `config_*.json` loads). Open `http://127.0.0.1:5000/`.
 - [ ] **Smoke test in browser:** open `/`, try **Polar** and **Cartesian** pads, open **Chassis configuration** and confirm wheel numbers change when you move controls.
 - [ ] **Read the code path:** in `menu.py`, find route **`drive_command`**: note `pct_angle`, `magnitude`, and **`chassis.move_velocity_radius`**.
-- [ ] **Stubs for later phases (already in repo):** `SGVHAK_Rover/control_mapping.py` (Phase 4), `scripts/joystick_drive.py` (Phase 5) — placeholders only until you implement those phases.
+- [ ] **Optional:** run `python scripts/verify_control_mapping.py` (checks shared math).
+- [ ] **Optional:** `pip install -e ".[joystick]"` then `python scripts/joystick_drive.py --list` (needs a USB controller plugged in).
 
 **Done when:** you can drive in the browser and see chassis status update (stub is fine).
 
@@ -71,70 +87,54 @@
 **Goal:** Be able to mimic the browser in code.
 
 - [ ] Read **`move_velocity_radius`** in `roverchassis.py`: note **velocity** range **±100** and what **radius** means (`minRadius`, `maxRadius`, straight = infinity).
-- [ ] Copy (on paper or in comments) the **radius** calculation from `drive_command` in `menu.py` from `pct_angle` (same formulas you will reuse for a stick).
+- [ ] Open **`control_mapping.polar_to_motion`** — that is the same radius math the browser and gamepad both use.
 
 **Done when:** you can explain in one sentence: “left/right on stick changes *radius*, forward/back changes *velocity*.”
 
 ---
 
-## Phase 4 — Extract “stick → motion” into one place (recommended)
+## Phase 4 — Shared mapping (DONE in repo — verify)
 
-**Goal:** One function used by both Flask and the joystick driver so they never disagree.
+**Goal:** One function used by both Flask and the joystick driver.
 
-- [ ] Add a small module, e.g. `SGVHAK_Rover/control_mapping.py`, with a pure function:
+- [x] Module `SGVHAK_Rover/control_mapping.py` with **`polar_to_motion(chassis, pct_angle, magnitude)`**.
+- [x] **`drive_command`** in `menu.py` calls that helper.
+- [ ] Re-test Polar, Cartesian, and Angle/Velocity drive pages in the browser.
 
-  `def polar_to_motion(pct_angle, magnitude):`  
-  `→` returns `(velocity, radius)` matching today’s `drive_command` behavior (including `pct_angle == 0` → straight).
-
-- [ ] Change **`drive_command`** in `menu.py` to call that function instead of inlining the math.
-- [ ] Re-test all three drive UIs in the browser.
-
-**Done when:** `menu.py` has no duplicated radius math; browser still works.
+**Done when:** `python scripts/verify_control_mapping.py` passes and browser driving still feels normal.
 
 ---
 
-## Phase 5 — Minimal joystick process (first real joystick)
+## Phase 5 — USB gamepad (DONE in repo — verify on hardware)
 
-**Goal:** A standalone script on the **same machine that owns the motors** reads axes and calls **`move_velocity_radius`**.
+**Goal:** `scripts/joystick_drive.py` on the Pi reads pygame axes and calls **`move_velocity_radius`**.
 
-- [ ] Choose a library (**`pygame`** is common; **`inputs`** is another). Add it to `setup.py` or document `pip install pygame` for the workshop.
-- [ ] New script, e.g. `scripts/joystick_drive.py` (or `SGVHAK_Rover/joystick_drive.py`), structure:
+- [x] **`pygame`** optional extra in `setup.py` (`pip install -e ".[joystick]"`).
+- [x] Deadband, deadman (default hold button 4), E-stop (default button 1), rate limit (~20 Hz).
+- [ ] On the Pi with a real controller: `python scripts/joystick_drive.py --list` then run without `--list`.
 
-  1. `import roverchassis` (ensure working directory / `PYTHONPATH` matches how you run Flask so configs load the same way).
-  2. `chassis = roverchassis.chassis()` then **`chassis.ensureready()`** once.
-  3. Init joystick; in a loop at ~10–20 Hz:
-     - read left stick (or chosen axes),
-     - map X/Y to `pct_angle` / `magnitude` (same ranges as the web UI, -100..100),
-     - `velocity, radius = polar_to_motion(pct_angle, magnitude)`,
-     - **`chassis.move_velocity_radius(velocity, radius)`**,
-     - on quit or released “deadman”, send **stop** (`velocity=0`, straight radius, or call the same path the **Stop motors** route uses).
+**Done when:** wheels follow sticks on the bench; E-stop always cuts power.
 
-- [ ] Add **deadband** (small stick wiggle → zero) so the rover does not crawl from noise.
-- [ ] Add a **deadman** (e.g. hold shoulder button or key) so motion only applies while held.
-
-**Done when:** with **Path A** stub, running the script while Flask is **not** commanding motors still shows sensible behavior in logs or optional prints; with **Path B**, wheels move smoothly.
-
-**Conflict rule:** Do **not** run the joystick script and the web drive at the same time unless you add explicit locking; simplest workshop rule: **only one driver at a time**.
+**Conflict rule:** Do **not** run the joystick script and the web drive at the same time; **only one driver at a time**.
 
 ---
 
-## Phase 6 — Make it “workshop safe”
+## Phase 6 — Optional polish
 
-- [ ] **Rate limit:** do not send commands faster than ~20–50 ms; merge or drop intermediate frames.
-- [ ] **E-stop:** map a button to **`wheel.poweroff()`** for all wheels (see `stop_motors` in `menu.py`) or `velocity=0` + safe steering behavior you prefer.
-- [ ] **Logging:** one line per second with velocity/radius for field debugging.
-
-**Done when:** someone else can run the script with a short README section (commands + “hold this button to enable”).
+- [x] Basic rate limit and E-stop are in `joystick_drive.py`.
+- [ ] **Logging:** optional print of velocity/radius once per second for field debugging.
+- [ ] **`systemd`** unit to start Flask or joystick at boot (team-specific).
 
 ---
 
 ## Phase 7 — Pi deployment (when hardware exists)
 
-- [ ] Copy project to Pi, install deps, verify **`flask run --host=0.0.0.0`** still works on your network.
-- [ ] Run `joystick_drive.py` on the Pi with the real `config_roverchassis.json`.
-- [ ] Optional: **`systemd`** unit to start the joystick script at boot (only if you want joystick *instead of* browser by default).
+- [ ] Copy project to Pi, then **`bash scripts/pi_install_rover.sh`** (venv + package + pygame).
+- [ ] Follow **`CONNECT_ROVER.txt`** (Sawppy config script, serial port, one drive mode).
+- [ ] Verify **`flask run --host=0.0.0.0`** on your network, or gamepad-only with **`python scripts/joystick_drive.py`**.
+- [ ] Optional: **`systemd`** unit to start Flask or the joystick script at boot.
 
-**Done when:** robot drives from the gamepad without opening a browser.
+**Done when:** robot drives from browser or gamepad on the bench, supervised.
 
 ---
 
@@ -151,13 +151,15 @@
 | File | Why |
 |------|-----|
 | `SGVHAK_Rover/roverchassis.py` | `move_velocity_radius`, geometry |
-| `SGVHAK_Rover/menu.py` | Today’s HTTP → motion; later calls shared mapper |
-| `SGVHAK_Rover/control_mapping.py` | **New:** shared stick/slider → `(velocity, radius)` |
-| `scripts/joystick_drive.py` | **New:** pygame loop |
+| `SGVHAK_Rover/menu.py` | HTTP routes; `drive_command` uses `control_mapping` |
+| `SGVHAK_Rover/control_mapping.py` | Shared stick/slider → `(velocity, radius)` |
+| `scripts/joystick_drive.py` | pygame gamepad loop |
+| `CONNECT_ROVER.txt` | Hardware hookup checklist |
+| `scripts/pi_install_rover.sh` | Pi/Linux venv + `pip install -e ".[joystick]"` |
+| `scripts/activate_sawppy_config.sh` | Copy Sawppy `config_roverchassis.json` |
 | `config_roboclaw.json` | `"port": "TEST"` for laptop stub |
 | `config_roverchassis.json` | Wheel layout + which controller backs each wheel |
 | `scripts/bootstrap_dev.sh` | Creates venv + editable install (Phase 1) |
-| `scripts/joystick_drive.py` | Stub entrypoint for Phase 5 |
 
 ---
 

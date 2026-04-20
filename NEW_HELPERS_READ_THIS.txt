@@ -2,6 +2,9 @@
   SGVHAK ROVER SOFTWARE — SIMPLE GUIDE FOR NEW PEOPLE
 ================================================================================
 
+*** FIRST TIME ON THE REAL ROBOT: open CONNECT_ROVER.txt in this same folder. ***
+
+
 WHAT IS THIS PROJECT?
 ---------------------
   This program runs on a small computer (often a Raspberry Pi) on the rover.
@@ -13,7 +16,7 @@ WHAT IS THIS PROJECT?
 
 THE BIG PICTURE (3 STEPS)
 -------------------------
-  1) You use a web page in the browser (or someday a real gamepad script).
+  1) You use a web page in the browser, OR a USB gamepad via scripts/joystick_drive.py.
 
   2) The web page sends numbers to the Python program (Flask) on the rover.
 
@@ -21,13 +24,15 @@ THE BIG PICTURE (3 STEPS)
      the motor hardware (or a "fake" motor for practice on a laptop).
 
 
-IMPORTANT: THE "JOYSTICK" ON THE WEB PAGE IS NOT A REAL JOYSTICK
-----------------------------------------------------------------
-  The round or square touch pad is a picture on the screen.  You drag the
-  knob with the mouse or your finger.
+IMPORTANT: SCREEN PAD VS REAL GAMEPAD
+--------------------------------------
+  The round or square touch pad is ONLY in the web browser (mouse or finger).
 
-  It is NOT reading a USB gamepad.  A real joystick would be a separate small
-  program (not finished in this repo yet).  See: workshops/joystick-interface-workshop.md
+  A physical USB gamepad is a SEPARATE program:  scripts/joystick_drive.py
+  (run on the Pi, with Flask stopped).  Install extras:  pip install -e ".[joystick]"
+
+  Full step list for hardware: CONNECT_ROVER.txt
+  Longer learning path: workshops/joystick-interface-workshop.md
 
 
 HOW TO RUN THE APP ON YOUR COMPUTER (PRACTICE MODE)
@@ -36,6 +41,10 @@ HOW TO RUN THE APP ON YOUR COMPUTER (PRACTICE MODE)
 
   A) One-time setup:
         ./scripts/bootstrap_dev.sh
+     Optional gamepad support (same venv):
+        pip install -e ".[joystick]"
+     Optional sanity check (no hardware):
+        python scripts/verify_control_mapping.py
 
   B) Every time you want to run the web app:
         source venv/bin/activate
@@ -100,7 +109,9 @@ FILES YOU MIGHT HEAR PEOPLE MENTION
   SGVHAK_Rover/static/*.js       —  Browser JavaScript (pads, sliders, polling).
 
   workshops/joystick-interface-workshop.md
-                                 —  Step-by-step plan to add a REAL gamepad later.
+                                 —  Full workshop (mapping + joystick are implemented).
+
+  CONNECT_ROVER.txt             —  Checklist: wiring, serial port, Sawppy config, drive.
 
 
 WHEN YOU GET A RASPBERRY PI / REAL HARDWARE
@@ -182,15 +193,15 @@ QUESTIONS TO ASK A MENTOR (GOOD STARTERS)
   [ ] Run through workshops/joystick-interface-workshop.md Phase 1 checkboxes
       and mark what you finished in your own notes (or a team checklist).
 
-  LATER — Only with a mentor (touches real robot or harder code)
-  --------------------------------------------------------------
-  [ ] Workshop Phase 3–4: understand move_velocity_radius; help extract mapping
-      into control_mapping.py (Python).
+  LATER — Only with a mentor (touches real robot)
+  ------------------------------------------------
+  [ ] Workshop Phase 3: read move_velocity_radius in roverchassis.py with a mentor.
 
-  [ ] Workshop Phase 5: pygame + scripts/joystick_drive.py (needs gamepad + Pi
-      or agreed test setup).
+  [ ] On the Pi: follow CONNECT_ROVER.txt (serial port, Sawppy config, gamepad or
+      web UI).  Real driving — always supervised.
 
-  [ ] On the Pi: real config files, real driving — always supervised.
+  [ ] Optional hard features (only if the team wants them): merge gamepad + Flask
+      in one process, HTTP JSON drive API — see workshop Phase 8.
 
   WHAT NOT TO DO ALONE (FIRST MONTH)
   ----------------------------------

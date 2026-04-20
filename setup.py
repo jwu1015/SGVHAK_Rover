@@ -8,4 +8,7 @@ setup(
                 'adafruit-pca9685',
 		'flask',
 		'pyserial'],
+	extras_require={
+		'joystick': ['pygame>=2.1'],
+	},
 	)
