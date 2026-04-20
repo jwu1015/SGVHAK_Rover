@@ -31,7 +31,7 @@ IMPORTANT: SCREEN PAD VS REAL GAMEPAD
 
   A physical USB gamepad can be used in two ways:
      — Terminal:  scripts/joystick_drive.py  (Flask stopped)
-     — Native window:  python -m SGVHAK_Rover.desktop_app  (sliders + optional gamepad; no browser)
+     — Native window:  python -m SGVHAK_Rover.desktop_app  (polar pad + sliders + optional gamepad; no browser)
   Install gamepad support:  pip install -e ".[joystick]"
 
   Full step list for hardware: CONNECT_ROVER.txt
